@@ -54,9 +54,13 @@ class Anvil extends McRegion{
 			if($subChunk->isEmpty()){
 				continue;
 			}
-			$tag = $this->serializeSubChunk($subChunk);
-			$tag->setByte("Y", $y);
-			$nbt->Sections[++$subChunks] = $tag;
+			$nbt->Sections[++$subChunks] = new CompoundTag("", [
+				new ByteTag("Y", $y),
+				new ByteArrayTag("Blocks", ChunkUtils::reorderByteArray($subChunk->getBlockIdArray())), //Generic in-memory chunks are currently always XZY
+				new ByteArrayTag("Data", ChunkUtils::reorderNibbleArray($subChunk->getBlockDataArray())),
+				new ByteArrayTag("SkyLight", ChunkUtils::reorderNibbleArray($subChunk->getBlockSkyLightArray(), "\xff")),
+				new ByteArrayTag("BlockLight", ChunkUtils::reorderNibbleArray($subChunk->getBlockLightArray()))
+			]);
 		}
 
 		$nbt->Biomes = new ByteArrayTag("Biomes", $chunk->getBiomeIdArray());
@@ -90,15 +94,6 @@ class Anvil extends McRegion{
 		return $writer->writeCompressed(ZLIB_ENCODING_DEFLATE, RegionLoader::$COMPRESSION_LEVEL);
 	}
 
-	protected function serializeSubChunk(SubChunk $subChunk) : CompoundTag{
-		return new CompoundTag("", [
-			new ByteArrayTag("Blocks", ChunkUtils::reorderByteArray($subChunk->getBlockIdArray())), //Generic in-memory chunks are currently always XZY
-			new ByteArrayTag("Data", ChunkUtils::reorderNibbleArray($subChunk->getBlockDataArray())),
-			new ByteArrayTag("SkyLight", ChunkUtils::reorderNibbleArray($subChunk->getBlockSkyLightArray(), "\xff")),
-			new ByteArrayTag("BlockLight", ChunkUtils::reorderNibbleArray($subChunk->getBlockLightArray()))
-		]);
-	}
-
 	public function nbtDeserialize(string $data){
 		$nbt = new NBT(NBT::BIG_ENDIAN);
 		try{
@@ -116,7 +111,12 @@ class Anvil extends McRegion{
 			if($chunk->Sections instanceof ListTag){
 				foreach($chunk->Sections as $subChunk){
 					if($subChunk instanceof CompoundTag){
-						$subChunks[$subChunk->Y->getValue()] = $this->deserializeSubChunk($subChunk);
+						$subChunks[$subChunk->Y->getValue()] = new SubChunk(
+							ChunkUtils::reorderByteArray($subChunk->Blocks->getValue()),
+							ChunkUtils::reorderNibbleArray($subChunk->Data->getValue()),
+							ChunkUtils::reorderNibbleArray($subChunk->SkyLight->getValue(), "\xff"),
+							ChunkUtils::reorderNibbleArray($subChunk->BlockLight->getValue())
+						);
 					}
 				}
 			}
@@ -146,15 +146,6 @@ class Anvil extends McRegion{
 			MainLogger::getLogger()->logException($e);
 			return null;
 		}
-	}
-
-	protected function deserializeSubChunk(CompoundTag $subChunk) : SubChunk{
-		return new SubChunk(
-			ChunkUtils::reorderByteArray($subChunk->Blocks->getValue()),
-			ChunkUtils::reorderNibbleArray($subChunk->Data->getValue()),
-			ChunkUtils::reorderNibbleArray($subChunk->SkyLight->getValue(), "\xff"),
-			ChunkUtils::reorderNibbleArray($subChunk->BlockLight->getValue())
-		);
 	}
 
 	public static function getProviderName() : string{

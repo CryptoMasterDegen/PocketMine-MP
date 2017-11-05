@@ -519,11 +519,10 @@ abstract class DataPacket extends BinaryStream{
 	 */
 	protected function getEntityLink() : EntityLink{
 		$link = new EntityLink();
-
 		$link->fromEntityUniqueId = $this->getEntityUniqueId();
 		$link->toEntityUniqueId = $this->getEntityUniqueId();
 		$link->type = $this->getByte();
-		$link->bool1 = $this->getBool();
+		$link->byte2 = $this->getByte();
 
 		return $link;
 	}
@@ -535,6 +534,7 @@ abstract class DataPacket extends BinaryStream{
 		$this->putEntityUniqueId($link->fromEntityUniqueId);
 		$this->putEntityUniqueId($link->toEntityUniqueId);
 		$this->putByte($link->type);
-		$this->putBool($link->bool1);
+		$this->putByte($link->byte2);
+
 	}
 }

@@ -39,11 +39,11 @@ class ItemFrame extends Spawnable{
 
 	public function __construct(Level $level, CompoundTag $nbt){
 		if(!$nbt->hasTag(self::TAG_ITEM_ROTATION, ByteTag::class)){
-			$nbt->setByte(self::TAG_ITEM_ROTATION, 0, true);
+			$nbt->setTag(new ByteTag(self::TAG_ITEM_ROTATION, 0));
 		}
 
 		if(!$nbt->hasTag(self::TAG_ITEM_DROP_CHANCE, FloatTag::class)){
-			$nbt->setFloat(self::TAG_ITEM_DROP_CHANCE, 1.0, true);
+			$nbt->setTag(new FloatTag(self::TAG_ITEM_DROP_CHANCE, 1.0));
 		}
 
 		parent::__construct($level, $nbt);

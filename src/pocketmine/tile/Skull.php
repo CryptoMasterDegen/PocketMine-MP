@@ -38,17 +38,15 @@ class Skull extends Spawnable{
 	const TYPE_CREEPER = 4;
 	const TYPE_DRAGON = 5;
 
-	const TAG_SKULL_TYPE = "SkullType"; //TAG_Byte
-	const TAG_ROT = "Rot"; //TAG_Byte
-	const TAG_MOUTH_MOVING = "MouthMoving"; //TAG_Byte
-	const TAG_MOUTH_TICK_COUNT = "MouthTickCount"; //TAG_Int
+	const TAG_SKULL_TYPE = "SkullType";
+	const TAG_ROT = "Rot";
 
 	public function __construct(Level $level, CompoundTag $nbt){
 		if(!$nbt->hasTag(self::TAG_SKULL_TYPE, ByteTag::class)){
-			$nbt->setByte(self::TAG_SKULL_TYPE, 0, true);
+			$nbt->setTag(new ByteTag(self::TAG_SKULL_TYPE, 0));
 		}
 		if(!$nbt->hasTag(self::TAG_ROT, ByteTag::class)){
-			$nbt->setByte(self::TAG_ROT, 0, true);
+			$nbt->setTag(new ByteTag(self::TAG_ROT, 0));
 		}
 		parent::__construct($level, $nbt);
 	}

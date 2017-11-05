@@ -160,7 +160,7 @@ auto-report:
 
 anonymous-statistics:
  #Sends anonymous statistics for data aggregation, plugin usage tracking
- enabled: false #TODO: re-enable this when we have a new stats host
+ enabled: true
  host: stats.pocketmine.net
 
 auto-updater:

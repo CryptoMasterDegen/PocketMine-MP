@@ -164,7 +164,8 @@ class Binary{
 	/**
 	 * Reads a 16-bit signed little-endian number
 	 *
-	 * @param string $str
+	 * @param      $str
+	 *
 	 * @return int
 	 */
 	public static function readSignedLShort(string $str) : int{
@@ -174,7 +175,8 @@ class Binary{
 	/**
 	 * Writes a 16-bit signed/unsigned little-endian number
 	 *
-	 * @param int $value
+	 * @param $value
+	 *
 	 * @return string
 	 */
 	public static function writeLShort(int $value) : string{
@@ -377,11 +379,12 @@ class Binary{
 	/**
 	 * Reads an 8-byte integer.
 	 *
-	 * @param string $str
+	 * @param string $x
 	 * @return int
 	 */
-	public static function readLong(string $str) : int{
-		return unpack("J", $str)[1];
+	public static function readLong(string $x) : int{
+		$int = unpack("N*", $x);
+		return ($int[1] << 32) | $int[2];
 	}
 
 	/**
@@ -391,7 +394,7 @@ class Binary{
 	 * @return string
 	 */
 	public static function writeLong(int $value) : string{
-		return pack("J", $value);
+		return pack("NN", $value >> 32, $value & 0xFFFFFFFF);
 	}
 
 	/**
@@ -401,7 +404,7 @@ class Binary{
 	 * @return int
 	 */
 	public static function readLLong(string $str) : int{
-		return unpack("P", $str)[1];
+		return self::readLong(strrev($str));
 	}
 
 	/**
@@ -411,7 +414,7 @@ class Binary{
 	 * @return string
 	 */
 	public static function writeLLong(int $value) : string{
-		return pack("P", $value);
+		return strrev(self::writeLong($value));
 	}
 
 

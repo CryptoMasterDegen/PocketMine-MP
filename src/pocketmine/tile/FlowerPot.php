@@ -37,12 +37,11 @@ class FlowerPot extends Spawnable{
 	const TAG_ITEM_DATA = "mData";
 
 	public function __construct(Level $level, CompoundTag $nbt){
-		//TODO: check PC format
 		if(!$nbt->hasTag(self::TAG_ITEM, ShortTag::class)){
-			$nbt->setShort(self::TAG_ITEM, 0, true);
+			$nbt->setTag(new ShortTag(self::TAG_ITEM, 0));
 		}
 		if(!$nbt->hasTag(self::TAG_ITEM_DATA, IntTag::class)){
-			$nbt->setInt(self::TAG_ITEM_DATA, 0, true);
+			$nbt->setTag(new IntTag(self::TAG_ITEM_DATA, 0));
 		}
 		parent::__construct($level, $nbt);
 	}

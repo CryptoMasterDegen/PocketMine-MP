@@ -26,7 +26,6 @@ namespace pocketmine\inventory;
 use pocketmine\event\Timings;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
-use pocketmine\network\mcpe\protocol\BatchPacket;
 use pocketmine\network\mcpe\protocol\CraftingDataPacket;
 use pocketmine\Server;
 use pocketmine\utils\Config;
@@ -36,18 +35,19 @@ use pocketmine\utils\UUID;
 class CraftingManager{
 
 	/** @var CraftingRecipe[] */
-	protected $recipes = [];
+	public $recipes = [];
 
 	/** @var ShapedRecipe[][] */
 	protected $shapedRecipes = [];
 	/** @var ShapelessRecipe[][] */
 	protected $shapelessRecipes = [];
+
 	/** @var FurnaceRecipe[] */
-	protected $furnaceRecipes = [];
+	public $furnaceRecipes = [];
 
 	private static $RECIPE_COUNT = 0;
 
-	/** @var BatchPacket */
+	/** @var CraftingDataPacket */
 	private $craftingDataCache;
 
 	public function __construct(){
@@ -113,21 +113,16 @@ class CraftingManager{
 
 		$pk->encode();
 
-		$batch = new BatchPacket();
-		$batch->addPacket($pk);
-		$batch->setCompressionLevel(Server::getInstance()->networkCompressionLevel);
-		$batch->encode();
-
-		$this->craftingDataCache = $batch;
+		$this->craftingDataCache = $pk;
 		Timings::$craftingDataCacheRebuildTimer->stopTiming();
 	}
 
 	/**
-	 * Returns a pre-compressed CraftingDataPacket for sending to players. Rebuilds the cache if it is not found.
+	 * Returns a CraftingDataPacket for sending to players. Rebuilds the cache if it is outdated.
 	 *
-	 * @return BatchPacket
+	 * @return CraftingDataPacket
 	 */
-	public function getCraftingDataPacket() : BatchPacket{
+	public function getCraftingDataPacket() : CraftingDataPacket{
 		if($this->craftingDataCache === null){
 			$this->buildCraftingDataCache();
 		}
@@ -235,7 +230,7 @@ class CraftingManager{
 		/** @var Item[] $row */
 		foreach($map as $y => $row){
 			foreach($row as $x => $item){
-				$map[$y][$x] = clone $item;
+				$item = clone $item;
 			}
 		}
 

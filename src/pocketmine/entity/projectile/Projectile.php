@@ -102,7 +102,7 @@ abstract class Projectile extends Entity{
 			}
 		}
 
-		$this->flagForDespawn();
+		$this->close();
 	}
 
 	public function saveNBT(){
